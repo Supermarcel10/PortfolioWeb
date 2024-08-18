@@ -1,0 +1,16 @@
+name: Update Submodules
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: runsascoded/update-submodules@v1
+      id: update
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - run: echo "Pushed new commit ${{ steps.update.outputs.sha }} with updated submodules"
