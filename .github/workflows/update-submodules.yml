@@ -9,8 +9,27 @@ jobs:
   update-submodules:
     runs-on: ubuntu-latest
     steps:
-    - uses: runsascoded/update-submodules@v1
-      id: update
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-    - run: echo "Pushed new commit ${{ steps.update.outputs.sha }} with updated submodules"
+        fetch-depth: 0
+
+    - name: Git config
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+
+    - name: Update submodules
+      run: |
+        git submodule update --init --recursive
+        git submodule update --remote --merge
+
+    - name: Commit and push if there are changes
+      run: |
+        if [[ -n "$(git status --porcelain)" ]]; then
+          git add .
+          git commit -m "Update submodules to latest main branches"
+          git push
+        else
+          echo "No changes to commit"
+        fi
